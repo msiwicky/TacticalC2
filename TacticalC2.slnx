@@ -1,1 +1,7 @@
-<Solution />
+<Solution>
+  <Project Path="TacticalC2.Api/TacticalC2.Api.csproj" />
+  <Project Path="TacticalC2.Application/TacticalC2.Application.csproj" />
+  <Project Path="TacticalC2.Domain.Tests/TacticalC2.Domain.Tests.csproj" />
+  <Project Path="TacticalC2.Domain/TacticalC2.Domain.csproj" />
+  <Project Path="TacticalC2.Infrastructure/TacticalC2.Infrastructure.csproj" />
+</Solution>
