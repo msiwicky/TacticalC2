@@ -1,4 +1,5 @@
 using Scalar.AspNetCore;
+using TacticalC2.Api.Hubs;
 using TacticalC2.Api.InMemory;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -6,7 +7,8 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
-builder.Services.AddControllers();    
+builder.Services.AddControllers(); 
+builder.Services.AddSignalR(); 
 
 builder.Services.AddSingleton<InMemoryUnitStore>();
 
@@ -21,6 +23,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.MapHub<UnitsHub>("/hubs/units");
 app.MapControllers();
 
 app.Run();
