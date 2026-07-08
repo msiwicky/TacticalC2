@@ -42,7 +42,8 @@ public class Worker(ILogger<Worker> logger) : BackgroundService
         {
             foreach (var unit in _units)
             {
-                logger.LogInformation("{Name}: {Lat}, {Lng}", unit.Name, unit.Latitude, unit.Longitude);
+                unit.Move(deltaSeconds: 1.0);
+                logger.LogInformation("{Name}: {Lat:F5}, {Lng:F5}", unit.Name, unit.Latitude, unit.Longitude);
             }
             
             await Task.Delay(1000, stoppingToken);
