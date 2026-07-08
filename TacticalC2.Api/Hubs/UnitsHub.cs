@@ -8,4 +8,16 @@ public class UnitsHub : Hub
     {
         await Groups.AddToGroupAsync(Context.ConnectionId, "units-subscribers");
     }
+    
+    public override async Task OnConnectedAsync()
+    {
+        Console.WriteLine($"Client connected: {Context.ConnectionId}");
+        await base.OnConnectedAsync();
+    }
+
+    public override async Task OnDisconnectedAsync(Exception? exception)
+    {
+        Console.WriteLine($"Client disconnected: {Context.ConnectionId}");
+        await base.OnDisconnectedAsync(exception);
+    }
 }
