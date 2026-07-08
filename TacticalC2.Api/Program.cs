@@ -1,4 +1,6 @@
+using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Scalar.AspNetCore;
+using TacticalC2.Api.Conventions;
 using TacticalC2.Api.Hubs;
 using TacticalC2.Api.InMemory;
 
@@ -7,7 +9,10 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
-builder.Services.AddControllers(); 
+builder.Services.AddControllers(options =>
+{
+    options.Conventions.Add(new RouteTokenTransformerConvention(new KebabCaseParameterTransformer()));
+});
 builder.Services.AddSignalR(); 
 
 builder.Services.AddSingleton<InMemoryUnitStore>();
