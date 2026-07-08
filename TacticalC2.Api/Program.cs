@@ -2,7 +2,9 @@ using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Scalar.AspNetCore;
 using TacticalC2.Api.Conventions;
 using TacticalC2.Api.Hubs;
-using TacticalC2.Api.InMemory;
+using TacticalC2.Application.Common.Interfaces;
+using TacticalC2.Application.Units.Commands.UpdateUnitPosition;
+using TacticalC2.Infrastructure.Persistence;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,7 +17,9 @@ builder.Services.AddControllers(options =>
 });
 builder.Services.AddSignalR(); 
 
-builder.Services.AddSingleton<InMemoryUnitStore>();
+builder.Services.AddSingleton<IUnitRepository, InMemoryUnitStore>();
+
+builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(UpdateUnitPositionCommand).Assembly));
 
 builder.Services.AddCors(options =>
 {
