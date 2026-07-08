@@ -4,4 +4,5 @@
   <Project Path="TacticalC2.Domain.Tests/TacticalC2.Domain.Tests.csproj" />
   <Project Path="TacticalC2.Domain/TacticalC2.Domain.csproj" />
   <Project Path="TacticalC2.Infrastructure/TacticalC2.Infrastructure.csproj" />
+  <Project Path="TacticalC2.Simulator/TacticalC2.Simulator.csproj" />
 </Solution>
