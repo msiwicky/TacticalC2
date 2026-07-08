@@ -17,6 +17,17 @@ builder.Services.AddSignalR();
 
 builder.Services.AddSingleton<InMemoryUnitStore>();
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowTestClient", policy =>
+    {
+        policy.WithOrigins("http://127.0.0.1:5500")
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials();
+    });
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -30,5 +41,7 @@ app.UseHttpsRedirection();
 
 app.MapHub<UnitsHub>("/hubs/units");
 app.MapControllers();
+app.UseCors("AllowTestClient");
+
 
 app.Run();

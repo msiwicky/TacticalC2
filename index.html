@@ -1,0 +1,32 @@
+<!doctype html>
+<html>
+	<head>
+		<title>SignalR Test Client</title>
+	</head>
+	<body>
+		<h1>Units Hub — test</h1>
+		<div id="log"></div>
+
+		<script src="https://cdn.jsdelivr.net/npm/@microsoft/signalr@8.0.0/dist/browser/signalr.min.js"></script>
+		<script>
+			const connection = new signalR.HubConnectionBuilder()
+				.withUrl("http://localhost:5136/hubs/units")
+				.build();
+
+			connection.on("UnitPositionUpdated", (unit) => {
+				console.log("UnitPositionUpdated:", unit);
+				document.getElementById("log").innerHTML +=
+					`<p>${unit.name}: ${unit.latitude}, ${unit.longitude}</p>`;
+			});
+
+			connection
+				.start()
+				.then(() => {
+					console.log("Connected!");
+					return connection.invoke("Subscribe");
+				})
+				.then(() => console.log("Subscribed!"))
+				.catch((err) => console.error("Connection error:", err));
+		</script>
+	</body>
+</html>
