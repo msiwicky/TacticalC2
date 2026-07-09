@@ -9,5 +9,7 @@ builder.Services.AddHttpClient("TacticalApi", client =>
 
 builder.Services.AddHostedService<Worker>();
 
+builder.Services.AddSingleton<TacticalApiClient>();
+
 var host = builder.Build();
 host.Run();

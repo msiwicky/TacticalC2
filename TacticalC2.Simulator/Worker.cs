@@ -2,7 +2,7 @@ using System.Net.Http.Json;
 
 namespace TacticalC2.Simulator;
 
-public class Worker(ILogger<Worker> logger,IHttpClientFactory httpClientFactory) : BackgroundService
+public class Worker(ILogger<Worker> logger,TacticalApiClient apiClient) : BackgroundService
 {
     private List<SimulatedUnit> _units = [];
 
@@ -40,53 +40,25 @@ public class Worker(ILogger<Worker> logger,IHttpClientFactory httpClientFactory)
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        _units = await RegisterUnits();
+        _units = CreateInitialUnits();
         
-        var client = httpClientFactory.CreateClient("TacticalApi");
+        foreach(var unit in _units)
+        {
+            unit.Id = await apiClient.RegisterUnit(unit);
+        }
         
         while (!stoppingToken.IsCancellationRequested)
         {
             foreach (var unit in _units)
             {
                 unit.Move(deltaSeconds: 1.0);
-                
-                await client.PutAsJsonAsync($"/api/units/{unit.Id}/position", new
-                {
-                    Latitude = unit.Latitude,
-                    Longitude = unit.Longitude,
-                    Heading = unit.Heading,
-                    Speed = unit.Speed
-                }, cancellationToken: stoppingToken);
+
+                await apiClient.SendPositionUpdateAsync(unit);
                 
                 logger.LogInformation("{Name}: {Lat:F5}, {Lng:F5}", unit.Name, unit.Latitude, unit.Longitude);
             }
             
             await Task.Delay(1000, stoppingToken);
         }
-    }
-    
-    private async Task<List<SimulatedUnit>> RegisterUnits()
-    {
-        var client = httpClientFactory.CreateClient("TacticalApi");
-        
-        var startingUnits = CreateInitialUnits();
-
-        foreach (var unit in startingUnits)
-        {
-            var response = await client.PostAsJsonAsync("/api/units", new
-            {
-                Name = unit.Name,
-                Type = 0,
-                Latitude = unit.Latitude,
-                Longitude = unit.Longitude,
-                Heading = unit.Heading,
-                Speed = unit.Speed
-            });
-
-            var newId = await response.Content.ReadFromJsonAsync<Guid>();
-            unit.Id = newId;
-        }
-
-        return startingUnits;
     }
 }
