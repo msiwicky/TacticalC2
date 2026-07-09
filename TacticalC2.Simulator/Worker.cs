@@ -42,11 +42,22 @@ public class Worker(ILogger<Worker> logger,IHttpClientFactory httpClientFactory)
     {
         _units = await RegisterUnits();
         
+        var client = httpClientFactory.CreateClient("TacticalApi");
+        
         while (!stoppingToken.IsCancellationRequested)
         {
             foreach (var unit in _units)
             {
                 unit.Move(deltaSeconds: 1.0);
+                
+                await client.PutAsJsonAsync($"/api/units/{unit.Id}/position", new
+                {
+                    Latitude = unit.Latitude,
+                    Longitude = unit.Longitude,
+                    Heading = unit.Heading,
+                    Speed = unit.Speed
+                }, cancellationToken: stoppingToken);
+                
                 logger.LogInformation("{Name}: {Lat:F5}, {Lng:F5}", unit.Name, unit.Latitude, unit.Longitude);
             }
             
@@ -57,6 +68,7 @@ public class Worker(ILogger<Worker> logger,IHttpClientFactory httpClientFactory)
     private async Task<List<SimulatedUnit>> RegisterUnits()
     {
         var client = httpClientFactory.CreateClient("TacticalApi");
+        
         var startingUnits = CreateInitialUnits();
 
         foreach (var unit in startingUnits)
