@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.SignalR;
 using TacticalC2.Api.Contracts;
 using TacticalC2.Api.Hubs;
 using TacticalC2.Application.Common.Interfaces;
+using TacticalC2.Application.Units.Commands.CreateUnit;
 using TacticalC2.Application.Units.Commands.UpdateUnitPosition;
 using Unit = TacticalC2.Domain.Entities.Unit;
 
@@ -17,6 +18,14 @@ public class UnitsController(IUnitRepository repository, IMediator mediator, IHu
     public ActionResult<IEnumerable<Unit>> GetAll()
     {
         return Ok(repository.GetAll());
+    }
+    
+    [HttpPost]
+    public async Task<ActionResult<Guid>> Create([FromBody] CreateUnitRequest request)
+    {
+        var id = await mediator.Send(new CreateUnitCommand(request.Name, request.Type, request.Latitude, request.Longitude, request.Heading, request.Speed));
+    
+        return Ok(id);
     }
 
     [HttpPut("{id:guid}/position")]

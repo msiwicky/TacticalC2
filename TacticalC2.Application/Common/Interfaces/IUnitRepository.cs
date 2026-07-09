@@ -6,4 +6,5 @@ public interface IUnitRepository
 {
     Unit? GetById(Guid id);
     IEnumerable<Unit> GetAll();
+    void Add(Unit unit);
 }

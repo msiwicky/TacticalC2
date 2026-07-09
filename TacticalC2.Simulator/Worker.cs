@@ -1,8 +1,10 @@
+using System.Net.Http.Json;
+
 namespace TacticalC2.Simulator;
 
-public class Worker(ILogger<Worker> logger) : BackgroundService
+public class Worker(ILogger<Worker> logger,IHttpClientFactory httpClientFactory) : BackgroundService
 {
-    private readonly List<SimulatedUnit> _units = CreateInitialUnits();
+    private List<SimulatedUnit> _units = [];
 
     private static List<SimulatedUnit> CreateInitialUnits()
     {
@@ -38,6 +40,8 @@ public class Worker(ILogger<Worker> logger) : BackgroundService
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
+        _units = await RegisterUnits();
+        
         while (!stoppingToken.IsCancellationRequested)
         {
             foreach (var unit in _units)
@@ -48,5 +52,29 @@ public class Worker(ILogger<Worker> logger) : BackgroundService
             
             await Task.Delay(1000, stoppingToken);
         }
+    }
+    
+    private async Task<List<SimulatedUnit>> RegisterUnits()
+    {
+        var client = httpClientFactory.CreateClient("TacticalApi");
+        var startingUnits = CreateInitialUnits();
+
+        foreach (var unit in startingUnits)
+        {
+            var response = await client.PostAsJsonAsync("/api/units", new
+            {
+                Name = unit.Name,
+                Type = 0,
+                Latitude = unit.Latitude,
+                Longitude = unit.Longitude,
+                Heading = unit.Heading,
+                Speed = unit.Speed
+            });
+
+            var newId = await response.Content.ReadFromJsonAsync<Guid>();
+            unit.Id = newId;
+        }
+
+        return startingUnits;
     }
 }
