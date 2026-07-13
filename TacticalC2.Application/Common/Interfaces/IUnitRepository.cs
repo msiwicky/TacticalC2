@@ -4,7 +4,7 @@ namespace TacticalC2.Application.Common.Interfaces;
 
 public interface IUnitRepository
 {
-    Unit? GetById(Guid id);
-    IEnumerable<Unit> GetAll();
-    void Add(Unit unit);
+    Task<Unit?> GetByIdAsync(Guid id);
+    Task<List<Unit>> GetAllAsync();
+    Task AddAsync(Unit unit);
 }

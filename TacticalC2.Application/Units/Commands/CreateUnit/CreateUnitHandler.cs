@@ -4,14 +4,16 @@ using Unit = TacticalC2.Domain.Entities.Unit;
 
 namespace TacticalC2.Application.Units.Commands.CreateUnit;
 
-public class CreateUnitHandler(IUnitRepository repository):IRequestHandler<CreateUnitCommand,Guid>
+public class CreateUnitHandler(IUnitRepository repository, IUnitOfWork unitOfWork) 
+    : IRequestHandler<CreateUnitCommand, Guid>
 {
-    public Task<Guid> Handle(CreateUnitCommand request, CancellationToken cancellationToken)
+    public async Task<Guid> Handle(CreateUnitCommand request, CancellationToken cancellationToken)
     {
         var unit = Unit.Create(request.Name, request.Type, request.Latitude, request.Longitude, request.Heading, request.Speed);
         
-        repository.Add(unit);
+        await repository.AddAsync(unit);
+        await unitOfWork.SaveChangesAsync(cancellationToken);
 
-        return Task.FromResult(unit.Id);
+        return unit.Id;
     }
 }

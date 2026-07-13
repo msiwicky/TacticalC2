@@ -15,9 +15,9 @@ namespace TacticalC2.Api.Controllers;
 public class UnitsController(IUnitRepository repository, IMediator mediator, IHubContext<UnitsHub> hubContext) : ControllerBase
 {
     [HttpGet]
-    public ActionResult<IEnumerable<Unit>> GetAll()
+    public async Task<ActionResult<IEnumerable<Unit>>> GetAll()
     {
-        return Ok(repository.GetAll());
+        return Ok(await repository.GetAllAsync());
     }
     
     [HttpPost]
@@ -28,7 +28,7 @@ public class UnitsController(IUnitRepository repository, IMediator mediator, IHu
         return Ok(id);
     }
 
-    [HttpPut("{id:guid}/position")]
+    [HttpPut("{id}/position")]
     public async Task<ActionResult> UpdatePosition(Guid id, [FromBody] UpdatePositionRequest request)
     {
         try
@@ -40,7 +40,7 @@ public class UnitsController(IUnitRepository repository, IMediator mediator, IHu
             return NotFound();
         }
 
-        var unit = repository.GetById(id);
+        var unit = await repository.GetByIdAsync(id);
         await hubContext.Clients.Group("units-subscribers").SendAsync("UnitPositionUpdated", unit);
 
         return NoContent();

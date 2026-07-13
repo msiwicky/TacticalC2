@@ -18,10 +18,12 @@ builder.Services.AddControllers(options =>
 });
 builder.Services.AddSignalR(); 
 
-builder.Services.AddSingleton<IUnitRepository, InMemoryUnitStore>();
+builder.Services.AddScoped<IUnitRepository, UnitRepository>();
 
 builder.Services.AddDbContext<TacticalDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("TacticalDb")));
+
+builder.Services.AddScoped<IUnitOfWork>(sp => sp.GetRequiredService<TacticalDbContext>());
 
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(UpdateUnitPositionCommand).Assembly));
 
