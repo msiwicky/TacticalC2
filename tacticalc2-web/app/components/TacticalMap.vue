@@ -11,10 +11,12 @@ const mapContainer = ref<HTMLDivElement | null>(null);
 let map: maplibregl.Map | null = null;
 const markers = new Map<string, maplibregl.Marker>();
 
+const config = useRuntimeConfig();
+
 onMounted(() => {
 	map = new maplibregl.Map({
 		container: mapContainer.value!,
-		style: "https://demotiles.maplibre.org/style.json",
+		style: `https://api.maptiler.com/maps/streets-v2/style.json?key=${config.public.maptilerKey}`,
 		center: [19.94, 50.06],
 		zoom: 10,
 	});
