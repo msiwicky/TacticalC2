@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
+using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
 using TacticalC2.Api.Conventions;
 using TacticalC2.Api.Hubs;
@@ -18,6 +19,9 @@ builder.Services.AddControllers(options =>
 builder.Services.AddSignalR(); 
 
 builder.Services.AddSingleton<IUnitRepository, InMemoryUnitStore>();
+
+builder.Services.AddDbContext<TacticalDbContext>(options =>
+    options.UseNpgsql(builder.Configuration.GetConnectionString("TacticalDb")));
 
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(UpdateUnitPositionCommand).Assembly));
 
