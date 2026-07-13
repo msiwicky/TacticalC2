@@ -11,7 +11,7 @@ public class TacticalApiClient(IHttpClientFactory httpClientFactory)
         var response = await _client.PostAsJsonAsync("/api/units", new
         {
             Name = unit.Name,
-            Type = 0,
+            Type = MapUnitType(unit.Type),
             Latitude = unit.Latitude,
             Longitude = unit.Longitude,
             Heading = unit.Heading,
@@ -31,4 +31,12 @@ public class TacticalApiClient(IHttpClientFactory httpClientFactory)
             Speed = unit.Speed
         });
     }
+    
+    private static int MapUnitType(string type) => type switch
+    {
+        "Drone" => 0,
+        "Vehicle" => 1,
+        "Infantry" => 2,
+        _ => throw new ArgumentException($"Unknown unit type: {type}")
+    };
 }
