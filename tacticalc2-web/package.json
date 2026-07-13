@@ -10,6 +10,7 @@
     "postinstall": "nuxt prepare"
   },
   "dependencies": {
+    "@microsoft/signalr": "^10.0.0",
     "@pinia/nuxt": "^0.11.3",
     "nuxt": "^4.4.8",
     "pinia": "^3.0.4",
