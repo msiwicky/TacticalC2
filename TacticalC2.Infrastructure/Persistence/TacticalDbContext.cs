@@ -9,10 +9,13 @@ public class TacticalDbContext(DbContextOptions<TacticalDbContext> options)
     : DbContext(options), IUnitOfWork
 {
     public DbSet<Unit> Units => Set<Unit>();
+    
+    public DbSet<UnitPositionHistory> UnitPositionHistories => Set<UnitPositionHistory>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.ApplyConfiguration(new UnitConfiguration());
+        modelBuilder.ApplyConfiguration(new UnitPositionHistoryConfiguration());
     }
     
     async Task IUnitOfWork.SaveChangesAsync(CancellationToken cancellationToken)

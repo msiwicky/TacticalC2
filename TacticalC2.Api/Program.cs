@@ -25,6 +25,8 @@ builder.Services.AddDbContext<TacticalDbContext>(options =>
 
 builder.Services.AddScoped<IUnitOfWork>(sp => sp.GetRequiredService<TacticalDbContext>());
 
+builder.Services.AddScoped<IUnitPositionHistoryRepository, UnitPositionHistoryRepository>();
+
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(UpdateUnitPositionCommand).Assembly));
 
 builder.Services.AddCors(options =>
