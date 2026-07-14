@@ -5,6 +5,12 @@ namespace TacticalC2.Simulator;
 public class TacticalApiClient(IHttpClientFactory httpClientFactory)
 {
     private readonly HttpClient _client = httpClientFactory.CreateClient("TacticalApi");
+    
+    public async Task<List<ApiUnitDto>> GetExistingUnitsAsync()
+    {
+        var response = await _client.GetFromJsonAsync<List<ApiUnitDto>>("/api/units");
+        return response ?? [];
+    }
 
     public async Task<Guid> RegisterUnit(SimulatedUnit unit)
     {

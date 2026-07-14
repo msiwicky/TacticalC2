@@ -5,4 +5,5 @@ namespace TacticalC2.Application.Common.Interfaces;
 public interface IUnitPositionHistoryRepository
 {
     Task AddAsync(UnitPositionHistory history);
+    Task<List<UnitPositionHistory>> GetByUnitIdAsync(Guid unitId, DateTime from, DateTime to);
 }

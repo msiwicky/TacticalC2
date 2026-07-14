@@ -6,6 +6,8 @@ using TacticalC2.Api.Hubs;
 using TacticalC2.Application.Common.Interfaces;
 using TacticalC2.Application.Units.Commands.CreateUnit;
 using TacticalC2.Application.Units.Commands.UpdateUnitPosition;
+using TacticalC2.Application.Units.Queries.GetUnitPositionHistory;
+using TacticalC2.Domain.Entities;
 using Unit = TacticalC2.Domain.Entities.Unit;
 
 namespace TacticalC2.Api.Controllers;
@@ -18,6 +20,13 @@ public class UnitsController(IUnitRepository repository, IMediator mediator, IHu
     public async Task<ActionResult<IEnumerable<Unit>>> GetAll()
     {
         return Ok(await repository.GetAllAsync());
+    }
+    [HttpGet("{id:guid}/history")]
+    public async Task<ActionResult<List<UnitPositionHistory>>> GetHistory(
+        Guid id, [FromQuery] DateTime from, [FromQuery] DateTime to)
+    {
+        var history = await mediator.Send(new GetUnitPositionHistoryQuery(id, from, to));
+        return Ok(history);
     }
     
     [HttpPost]

@@ -40,25 +40,42 @@ public class Worker(ILogger<Worker> logger,TacticalApiClient apiClient) : Backgr
 
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        _units = CreateInitialUnits();
-        
-        foreach(var unit in _units)
-        {
-            unit.Id = await apiClient.RegisterUnit(unit);
-        }
-        
+        _units = await InitializeUnits();
+
         while (!stoppingToken.IsCancellationRequested)
         {
             foreach (var unit in _units)
             {
                 unit.Move(deltaSeconds: 1.0);
-
                 await apiClient.SendPositionUpdateAsync(unit);
-                
                 logger.LogInformation("{Name}: {Lat:F5}, {Lng:F5}", unit.Name, unit.Latitude, unit.Longitude);
             }
-            
+
             await Task.Delay(1000, stoppingToken);
         }
+    }
+    
+    private async Task<List<SimulatedUnit>> InitializeUnits()
+    {
+        var desiredUnits = CreateInitialUnits();
+        var existingUnits = await apiClient.GetExistingUnitsAsync();
+
+        foreach (var unit in desiredUnits)
+        {
+            var existing = existingUnits.FirstOrDefault(e => e.Name == unit.Name);
+
+            if (existing is not null)
+            {
+                logger.LogInformation("Reusing existing unit: {Name} ({Id})", unit.Name, existing.Id);
+                unit.Id = existing.Id;
+            }
+            else
+            {
+                logger.LogInformation("Registering new unit: {Name}", unit.Name);
+                unit.Id = await apiClient.RegisterUnit(unit);
+            }
+        }
+
+        return desiredUnits;
     }
 }
