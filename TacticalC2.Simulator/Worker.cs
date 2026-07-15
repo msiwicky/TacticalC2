@@ -66,8 +66,12 @@ public class Worker(ILogger<Worker> logger,TacticalApiClient apiClient) : Backgr
 
             if (existing is not null)
             {
-                logger.LogInformation("Reusing existing unit: {Name} ({Id})", unit.Name, existing.Id);
+                logger.LogInformation("Reusing existing unit: {Name} ({Id}) at last known position", unit.Name, existing.Id);
                 unit.Id = existing.Id;
+                unit.Latitude = existing.Latitude;
+                unit.Longitude = existing.Longitude;
+                unit.Heading = existing.Heading;
+                unit.Speed = existing.Speed;
             }
             else
             {

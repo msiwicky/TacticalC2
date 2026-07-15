@@ -40,6 +40,50 @@ function emitCurrentPosition() {
 }
 
 watch(currentIndex, emitCurrentPosition);
+
+const isPlaying = ref(false);
+const playbackSpeed = ref(1); // mnożnik: 1x, 2x, 4x
+let playbackInterval: ReturnType<typeof setInterval> | null = null;
+
+function togglePlay() {
+	if (isPlaying.value) {
+		stopPlayback();
+	} else {
+		startPlayback();
+	}
+}
+
+function startPlayback() {
+	if (history.value.length === 0) return;
+
+	isPlaying.value = true;
+	playbackInterval = setInterval(() => {
+		if (currentIndex.value >= history.value.length - 1) {
+			stopPlayback();
+			return;
+		}
+		currentIndex.value++;
+	}, 1000 / playbackSpeed.value);
+}
+
+function stopPlayback() {
+	isPlaying.value = false;
+	if (playbackInterval) {
+		clearInterval(playbackInterval);
+		playbackInterval = null;
+	}
+}
+
+watch(selectedUnitId, stopPlayback);
+
+watch(playbackSpeed, () => {
+	if (isPlaying.value) {
+		stopPlayback();
+		startPlayback();
+	}
+});
+
+onUnmounted(stopPlayback);
 </script>
 
 <template>
@@ -67,10 +111,31 @@ watch(currentIndex, emitCurrentPosition);
 				v-model.number="currentIndex"
 				class="w-full"
 			/>
-			<p class="text-sm text-neutral-400 mt-1" v-if="currentEntry">
-				{{ new Date(currentEntry.timestampUtc).toLocaleTimeString() }}
-				({{ currentIndex + 1 }} / {{ history.length }})
-			</p>
+
+			<div class="flex items-center gap-2 mt-2">
+				<button
+					@click="togglePlay"
+					class="bg-blue-600 hover:bg-blue-700 px-3 py-1 rounded text-sm"
+				>
+					{{ isPlaying ? "Pause" : "Play" }}
+				</button>
+
+				<select
+					v-model.number="playbackSpeed"
+					class="bg-neutral-800 text-white p-1 rounded text-sm"
+				>
+					<option :value="1">1x</option>
+					<option :value="2">2x</option>
+					<option :value="4">4x</option>
+				</select>
+
+				<p class="text-sm text-neutral-400" v-if="currentEntry">
+					{{
+						new Date(currentEntry.timestampUtc).toLocaleTimeString()
+					}}
+					({{ currentIndex + 1 }} / {{ history.length }})
+				</p>
+			</div>
 		</div>
 
 		<div v-else-if="selectedUnitId" class="text-sm text-neutral-500">
