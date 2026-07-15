@@ -5,7 +5,31 @@ import type { Unit } from "~/types/Unit";
 
 const props = defineProps<{
 	units: Map<string, Unit>;
+	playbackEntry?: UnitHistoryEntry | null;
 }>();
+
+let playbackMarker: maplibregl.Marker | null = null;
+
+watch(
+	() => props.playbackEntry,
+	(entry) => {
+		if (!map) return;
+
+		if (!entry) {
+			playbackMarker?.remove();
+			playbackMarker = null;
+			return;
+		}
+
+		if (!playbackMarker) {
+			playbackMarker = new maplibregl.Marker({ color: "#a855f7" }) // fioletowy, żeby odróżnić od żywych jednostek
+				.setLngLat([entry.longitude, entry.latitude])
+				.addTo(map);
+		} else {
+			playbackMarker.setLngLat([entry.longitude, entry.latitude]);
+		}
+	},
+);
 
 const mapContainer = ref<HTMLDivElement | null>(null);
 let map: maplibregl.Map | null = null;
