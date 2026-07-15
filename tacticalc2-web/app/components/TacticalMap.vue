@@ -11,6 +11,37 @@ const mapContainer = ref<HTMLDivElement | null>(null);
 let map: maplibregl.Map | null = null;
 const markers = new Map<string, maplibregl.Marker>();
 
+function createPopup(unit: Unit): maplibregl.Popup {
+	return new maplibregl.Popup({ offset: 25, closeButton: false }).setHTML(
+		popupContent(unit),
+	);
+}
+
+function popupContent(unit: Unit): string {
+	return `
+    <div style="font-family: sans-serif; font-size: 13px;">
+      <strong>${unit.name}</strong><br/>
+      Type: ${getTypeName(unit.type)}<br/>
+      Heading: ${unit.heading.toFixed(0)}°<br/>
+      Speed: ${unit.speed.toFixed(1)} m/s<br/>
+      Last seen: ${new Date(unit.lastSeenUtc).toLocaleTimeString()}
+    </div>
+  `;
+}
+
+function getTypeName(type: number): string {
+	switch (type) {
+		case 0:
+			return "Drone";
+		case 1:
+			return "Vehicle";
+		case 2:
+			return "Infantry";
+		default:
+			return "Unknown";
+	}
+}
+
 const config = useRuntimeConfig();
 
 onMounted(() => {
@@ -31,14 +62,21 @@ watch(
 			let marker = markers.get(unit.id);
 
 			if (!marker) {
+				const popup = createPopup(unit);
 				marker = new maplibregl.Marker({
 					color: getColorForType(unit.type),
 				})
 					.setLngLat([unit.longitude, unit.latitude])
+					.setPopup(popup)
 					.addTo(map);
 				markers.set(unit.id, marker);
 			} else {
 				marker.setLngLat([unit.longitude, unit.latitude]);
+
+				const popup = marker.getPopup();
+				if (popup) {
+					popup.setHTML(popupContent(unit));
+				}
 			}
 		}
 	},
