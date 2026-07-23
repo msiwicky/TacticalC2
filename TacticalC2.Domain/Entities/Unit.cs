@@ -49,4 +49,22 @@ public class Unit
         if (elapsed < TimeSpan.FromSeconds(5)) return UnitStatus.Active;
         return elapsed < TimeSpan.FromSeconds(15) ? UnitStatus.Stale : UnitStatus.Offline;
     }
+    
+    public (double Latitude, double Longitude) PredictCurrentPosition(DateTime now)
+    {
+        var elapsedSeconds = (now - LastSeenUtc).TotalSeconds;
+
+        if (elapsedSeconds <= 0)
+            return (Latitude, Longitude);
+
+        const double metersPerDegree = 111_000;
+        var distanceMeters = Speed * elapsedSeconds;
+        var distanceDegrees = distanceMeters / metersPerDegree;
+        var headingRadians = Heading * Math.PI / 180.0;
+
+        var predictedLat = Latitude + distanceDegrees * Math.Cos(headingRadians);
+        var predictedLng = Longitude + distanceDegrees * Math.Sin(headingRadians);
+
+        return (predictedLat, predictedLng);
+    }
 }

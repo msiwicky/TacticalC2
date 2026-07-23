@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
+using TacticalC2.Api.BackgroundServices;
 using TacticalC2.Api.Conventions;
 using TacticalC2.Api.Hubs;
 using TacticalC2.Application.Common.Interfaces;
@@ -39,6 +40,8 @@ builder.Services.AddCors(options =>
             .AllowCredentials();
     });
 });
+
+builder.Services.AddHostedService<PositionPredictionService>();
 
 var app = builder.Build();
 

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { UnitHistoryEntry } from "~/composables/useApiClient";
 
-const { units, isConnected, connect } = useSignalR();
+const { units, predictedPositions, isConnected, connect } = useSignalR();
 const playbackEntry = ref<UnitHistoryEntry | null>(null);
 
 onMounted(() => {
@@ -27,7 +27,11 @@ function handlePlaybackPosition(entry: UnitHistoryEntry | null) {
 			<p class="text-sm text-neutral-500 mb-4">
 				Connected: {{ isConnected }}
 			</p>
-			<TacticalMap :units="units" :playback-entry="playbackEntry" />
+			<TacticalMap
+				:units="units"
+				:predicted-positions="predictedPositions"
+				:playback-entry="playbackEntry"
+			/>
 		</div>
 	</div>
 </template>

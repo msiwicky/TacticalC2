@@ -1,12 +1,51 @@
 <script setup lang="ts">
 import maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
+import type { PredictedPosition } from "~/composables/useSignalR";
 import type { Unit } from "~/types/Unit";
 
 const props = defineProps<{
 	units: Map<string, Unit>;
+	predictedPositions: Map<string, PredictedPosition>;
 	playbackEntry?: UnitHistoryEntry | null;
 }>();
+
+const predictionMarkers = new Map<string, maplibregl.Marker>();
+
+watch(
+	() => props.predictedPositions,
+	(predictions) => {
+		if (!map) return;
+
+		for (const [unitId, marker] of predictionMarkers) {
+			if (!predictions.has(unitId)) {
+				marker.remove();
+				predictionMarkers.delete(unitId);
+			}
+		}
+
+		for (const prediction of predictions.values()) {
+			let marker = predictionMarkers.get(prediction.unitId);
+
+			const el = document.createElement("div");
+			el.style.width = "16px";
+			el.style.height = "16px";
+			el.style.borderRadius = "50%";
+			el.style.border = "2px dashed #ef4444";
+			el.style.backgroundColor = "rgba(239, 68, 68, 0.2)";
+
+			if (!marker) {
+				marker = new maplibregl.Marker({ element: el })
+					.setLngLat([prediction.longitude, prediction.latitude])
+					.addTo(map);
+				predictionMarkers.set(prediction.unitId, marker);
+			} else {
+				marker.setLngLat([prediction.longitude, prediction.latitude]);
+			}
+		}
+	},
+	{ deep: true },
+);
 
 let playbackMarker: maplibregl.Marker | null = null;
 
