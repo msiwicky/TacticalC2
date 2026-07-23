@@ -47,6 +47,13 @@ public class Worker(ILogger<Worker> logger,TacticalApiClient apiClient) : Backgr
             foreach (var unit in _units)
             {
                 unit.Move(deltaSeconds: 1.0);
+                
+                if (unit.IsConnectionLost)
+                {
+                    logger.LogWarning("{Name}: connection lost", unit.Name);
+                    continue;
+                }
+                
                 await apiClient.SendPositionUpdateAsync(unit);
                 logger.LogInformation("{Name}: {Lat:F5}, {Lng:F5}", unit.Name, unit.Latitude, unit.Longitude);
             }
