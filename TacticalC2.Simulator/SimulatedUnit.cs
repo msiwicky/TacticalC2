@@ -2,6 +2,7 @@
 
 public class SimulatedUnit
 {
+    private static readonly Random Random = new();
     public required Guid Id { get; set; }
     public required string Name { get; init; }
     public required string Type { get; init; }
@@ -21,5 +22,19 @@ public class SimulatedUnit
 
         Latitude += distanceDegrees * Math.Cos(headingRadians);
         Longitude += distanceDegrees * Math.Sin(headingRadians);
+        
+        ApplyGpsNoise();
+    }
+    
+    private void ApplyGpsNoise()
+    {
+        const double maxNoiseMeters = 3.0;
+        const double metersPerDegree = 111_000;
+
+        var noiseLatMeters = (Random.NextDouble() * 2 - 1) * maxNoiseMeters;
+        var noiseLngMeters = (Random.NextDouble() * 2 - 1) * maxNoiseMeters;
+
+        Latitude += noiseLatMeters / metersPerDegree;
+        Longitude += noiseLngMeters / metersPerDegree;
     }
 }
