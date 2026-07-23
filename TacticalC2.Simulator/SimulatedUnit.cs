@@ -23,22 +23,34 @@ public class SimulatedUnit
             {
                 IsConnectionLost = false;
             }
+            
+            DriftHeading(maxDegreesPerTick: 8.0);
+            MoveForward(deltaSeconds);
             return; 
         }
         
         MaybeStartConnectionLoss();
         
-        const double metersPerDegree = 111_000;
+        DriftHeading(maxDegreesPerTick: 2.0);
+        MoveForward(deltaSeconds);
         
+        ApplyGpsNoise();
+    }
+    private void MoveForward(double deltaSeconds)
+    {
+        const double metersPerDegree = 111_000;
         var distanceMeters = Speed * deltaSeconds;
         var distanceDegrees = distanceMeters / metersPerDegree;
-
         var headingRadians = Heading * Math.PI / 180.0;
 
         Latitude += distanceDegrees * Math.Cos(headingRadians);
         Longitude += distanceDegrees * Math.Sin(headingRadians);
-        
-        ApplyGpsNoise();
+    }
+    
+    private void DriftHeading(double maxDegreesPerTick)
+    {
+        var change = (Random.NextDouble() * 2 - 1) * maxDegreesPerTick;
+        Heading = (Heading + change + 360) % 360;
     }
     
     private void ApplyGpsNoise()
