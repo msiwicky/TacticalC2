@@ -22,7 +22,9 @@ builder.Services.AddSignalR();
 builder.Services.AddScoped<IUnitRepository, UnitRepository>();
 
 builder.Services.AddDbContext<TacticalDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("TacticalDb")));
+    options.UseNpgsql(
+        builder.Configuration.GetConnectionString("TacticalDb"),
+        npgsqlOptions => npgsqlOptions.UseNetTopologySuite()));
 
 builder.Services.AddScoped<IUnitOfWork>(sp => sp.GetRequiredService<TacticalDbContext>());
 

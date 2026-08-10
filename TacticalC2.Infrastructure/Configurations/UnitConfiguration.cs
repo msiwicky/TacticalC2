@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using NetTopologySuite.Geometries;
 using TacticalC2.Domain.Entities;
 
 namespace TacticalC2.Infrastructure.Configurations;
@@ -13,5 +14,11 @@ public class UnitConfiguration:IEntityTypeConfiguration<Unit>
        builder.Property(u => u.Name)
            .IsRequired()
            .HasMaxLength(200);
+       
+       builder.Property<Point>("Location")
+           .HasColumnType("geography (point)");
+
+       builder.HasIndex("Location")
+           .HasMethod("GIST");
     }
 }
