@@ -30,6 +30,8 @@ builder.Services.AddScoped<IUnitOfWork>(sp => sp.GetRequiredService<TacticalDbCo
 
 builder.Services.AddScoped<IUnitPositionHistoryRepository, UnitPositionHistoryRepository>();
 
+builder.Services.AddScoped<IGeofenceZoneRepository, EfGeofenceZoneRepository>();
+
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(UpdateUnitPositionCommand).Assembly));
 
 builder.Services.AddCors(options =>

@@ -18,7 +18,7 @@ public class GeofenceZoneConfiguration : IEntityTypeConfiguration<GeofenceZone>
         builder.Ignore(z => z.BoundaryPoints); 
 
         builder.Property<Polygon>("Boundary")
-            .HasColumnType("geography (polygon)");
+            .HasColumnType("geometry (polygon, 4326)");
 
         builder.HasIndex("Boundary")
             .HasMethod("GIST");

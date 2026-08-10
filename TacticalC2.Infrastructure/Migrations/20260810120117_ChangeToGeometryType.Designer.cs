@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NetTopologySuite.Geometries;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
@@ -12,9 +13,11 @@ using TacticalC2.Infrastructure.Persistence;
 namespace TacticalC2.Infrastructure.Migrations
 {
     [DbContext(typeof(TacticalDbContext))]
-    partial class TacticalDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260810120117_ChangeToGeometryType")]
+    partial class ChangeToGeometryType
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -44,7 +47,7 @@ namespace TacticalC2.Infrastructure.Migrations
 
                     NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex("Boundary"), "GIST");
 
-                    b.ToTable("GeofenceZones", (string)null);
+                    b.ToTable("GeofenceZones");
                 });
 
             modelBuilder.Entity("TacticalC2.Domain.Entities.Unit", b =>
@@ -85,7 +88,7 @@ namespace TacticalC2.Infrastructure.Migrations
 
                     NpgsqlIndexBuilderExtensions.HasMethod(b.HasIndex("Location"), "GIST");
 
-                    b.ToTable("Units", (string)null);
+                    b.ToTable("Units");
                 });
 
             modelBuilder.Entity("TacticalC2.Domain.Entities.UnitPositionHistory", b =>
@@ -116,7 +119,7 @@ namespace TacticalC2.Infrastructure.Migrations
 
                     b.HasIndex("UnitId", "TimestampUtc");
 
-                    b.ToTable("UnitPositionHistories", (string)null);
+                    b.ToTable("UnitPositionHistories");
                 });
 #pragma warning restore 612, 618
         }

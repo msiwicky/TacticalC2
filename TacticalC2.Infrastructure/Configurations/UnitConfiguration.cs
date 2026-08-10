@@ -16,7 +16,7 @@ public class UnitConfiguration:IEntityTypeConfiguration<Unit>
            .HasMaxLength(200);
        
        builder.Property<Point>("Location")
-           .HasColumnType("geography (point)");
+           .HasColumnType("geometry (point, 4326)");
 
        builder.HasIndex("Location")
            .HasMethod("GIST");
