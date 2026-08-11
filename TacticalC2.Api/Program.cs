@@ -27,9 +27,8 @@ builder.Services.AddDbContext<TacticalDbContext>(options =>
         npgsqlOptions => npgsqlOptions.UseNetTopologySuite()));
 
 builder.Services.AddScoped<IUnitOfWork>(sp => sp.GetRequiredService<TacticalDbContext>());
-
 builder.Services.AddScoped<IUnitPositionHistoryRepository, UnitPositionHistoryRepository>();
-
+builder.Services.AddScoped<IAlertRepository, AlertRepository>();
 builder.Services.AddScoped<IGeofenceZoneRepository, EfGeofenceZoneRepository>();
 
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(UpdateUnitPositionCommand).Assembly));

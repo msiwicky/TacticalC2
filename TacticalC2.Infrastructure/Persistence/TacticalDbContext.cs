@@ -14,6 +14,8 @@ public class TacticalDbContext(DbContextOptions<TacticalDbContext> options)
     public DbSet<Unit> Units => Set<Unit>();
     
     public DbSet<UnitPositionHistory> UnitPositionHistories => Set<UnitPositionHistory>();
+    
+    public DbSet<Alert> Alerts => Set<Alert>();
 
     public DbSet<GeofenceZone> GeofenceZones => Set<GeofenceZone>();
 
@@ -22,6 +24,7 @@ public class TacticalDbContext(DbContextOptions<TacticalDbContext> options)
         modelBuilder.ApplyConfiguration(new UnitConfiguration());
         modelBuilder.ApplyConfiguration(new UnitPositionHistoryConfiguration());
         modelBuilder.ApplyConfiguration(new GeofenceZoneConfiguration());
+        modelBuilder.ApplyConfiguration(new AlertConfiguration());
     }
     
     public override int SaveChanges()

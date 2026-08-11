@@ -7,4 +7,5 @@ public interface IUnitRepository
     Task<Unit?> GetByIdAsync(Guid id);
     Task<List<Unit>> GetAllAsync();
     Task AddAsync(Unit unit);
+    Task<List<Guid>> GetZoneIdsContainingUnitAsync(Guid unitId);
 }

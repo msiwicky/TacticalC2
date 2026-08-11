@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using NetTopologySuite.Geometries;
 using TacticalC2.Application.Common.Interfaces;
 using TacticalC2.Domain.Entities;
 
@@ -14,5 +15,18 @@ public class UnitRepository(TacticalDbContext dbContext) : IUnitRepository
     {
         dbContext.Units.Add(unit);
         return Task.CompletedTask;
+    }
+    
+    public async Task<List<Guid>> GetZoneIdsContainingUnitAsync(Guid unitId)
+    {
+        var unit = await dbContext.Units.FirstOrDefaultAsync(u => u.Id == unitId);
+        if (unit is null) return [];
+
+        var unitLocation = dbContext.Entry(unit).Property<Point>("Location").CurrentValue;
+
+        return await dbContext.GeofenceZones
+            .Where(z => EF.Property<Polygon>(z, "Boundary").Contains(unitLocation))
+            .Select(z => z.Id)
+            .ToListAsync();
     }
 }
