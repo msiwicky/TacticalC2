@@ -20,4 +20,8 @@ public class GeofenceZone
             BoundaryPoints = boundaryPoints
         };
     }
+    public void RehydrateBoundaryPoints(List<(double Latitude, double Longitude)> points)
+    {
+        BoundaryPoints = points;
+    }
 }

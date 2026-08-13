@@ -8,10 +8,20 @@ export interface PredictedPosition {
 	status: string;
 }
 
+export interface Alert {
+	id: string;
+	unitId: string;
+	zoneId: string;
+	severity: number;
+	message: string;
+	timestampUtc: string;
+}
+
 export function useSignalR() {
 	const units = ref<Map<string, Unit>>(new Map());
 	const predictedPositions = ref<Map<string, PredictedPosition>>(new Map());
 	const isConnected = ref(false);
+	const alerts = ref<Alert[]>([]);
 
 	let connection: signalR.HubConnection | null = null;
 
@@ -32,6 +42,10 @@ export function useSignalR() {
 				predictedPositions.value.set(prediction.unitId, prediction);
 			},
 		);
+
+		connection.on("AlertRaised", (alert: Alert) => {
+			alerts.value.unshift(alert);
+		});
 
 		connection.onreconnected(() => {
 			isConnected.value = true;
@@ -54,6 +68,7 @@ export function useSignalR() {
 	return {
 		units,
 		predictedPositions,
+		alerts,
 		isConnected,
 		connect,
 		disconnect,

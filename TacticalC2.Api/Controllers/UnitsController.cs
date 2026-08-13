@@ -40,9 +40,11 @@ public class UnitsController(IUnitRepository repository, IMediator mediator, IHu
     [HttpPut("{id}/position")]
     public async Task<ActionResult> UpdatePosition(Guid id, [FromBody] UpdatePositionRequest request)
     {
+        List<Alert> newAlerts;
+        
         try
         {
-            await mediator.Send(new UpdateUnitPositionCommand(id, request.Latitude, request.Longitude, request.Heading, request.Speed));
+            newAlerts = await mediator.Send(new UpdateUnitPositionCommand(id, request.Latitude, request.Longitude, request.Heading, request.Speed));
         }
         catch (KeyNotFoundException)
         {
@@ -51,6 +53,11 @@ public class UnitsController(IUnitRepository repository, IMediator mediator, IHu
 
         var unit = await repository.GetByIdAsync(id);
         await hubContext.Clients.Group("units-subscribers").SendAsync("UnitPositionUpdated", unit);
+        
+        foreach (var alert in newAlerts)
+        {
+            await hubContext.Clients.Group("units-subscribers").SendAsync("AlertRaised", alert);
+        }
 
         return NoContent();
     }

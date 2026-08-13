@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using NetTopologySuite.Geometries;
 using TacticalC2.Application.Common.Interfaces;
 using TacticalC2.Domain.Entities;
 
@@ -12,5 +13,21 @@ public class EfGeofenceZoneRepository(TacticalDbContext dbContext) : IGeofenceZo
         return Task.CompletedTask;
     }
 
-    public Task<List<GeofenceZone>> GetAllAsync() => dbContext.GeofenceZones.ToListAsync();
+    public async Task<List<GeofenceZone>> GetAllAsync()
+    {
+        var zones = await dbContext.GeofenceZones.ToListAsync();
+
+        foreach (var zone in zones)
+        {
+            var boundary = dbContext.Entry(zone).Property<Polygon>("Boundary").CurrentValue;
+
+            var points = boundary.Coordinates
+                .Select(c => (Latitude: c.Y, Longitude: c.X))
+                .ToList();
+            
+            zone.RehydrateBoundaryPoints(points);
+        }
+
+        return zones;
+    }
 }

@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import type { UnitHistoryEntry } from "~/composables/useApiClient";
 
-const { units, predictedPositions, isConnected, connect } = useSignalR();
+const { units, predictedPositions, alerts, isConnected, connect } =
+	useSignalR();
 const playbackEntry = ref<UnitHistoryEntry | null>(null);
 
 onMounted(() => {
@@ -21,6 +22,7 @@ function handlePlaybackPosition(entry: UnitHistoryEntry | null) {
 				:units="units"
 				@playback-position="handlePlaybackPosition"
 			/>
+			<AlertPanel :alerts="alerts" />
 		</div>
 		<div class="flex-1 p-4">
 			<h1 class="text-2xl font-bold mb-2">Tactical C2 Dashboard</h1>

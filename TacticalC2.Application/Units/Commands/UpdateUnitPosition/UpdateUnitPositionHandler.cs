@@ -9,9 +9,9 @@ public class UpdateUnitPositionHandler(IUnitRepository unitRepository,
     IUnitPositionHistoryRepository historyRepository,
     IAlertRepository alertRepository,
     IUnitOfWork unitOfWork) 
-    : IRequestHandler<UpdateUnitPositionCommand>
+    : IRequestHandler<UpdateUnitPositionCommand, List<Alert>>
 {
-    public async Task Handle(UpdateUnitPositionCommand request, CancellationToken cancellationToken)
+    public async Task<List<Alert>> Handle(UpdateUnitPositionCommand request, CancellationToken cancellationToken)
     {
         var unit = await unitRepository.GetByIdAsync(request.UnitId);
         
@@ -40,5 +40,22 @@ public class UpdateUnitPositionHandler(IUnitRepository unitRepository,
         }
 
         await unitOfWork.SaveChangesAsync(cancellationToken);
+        
+        var newAlerts = new List<Alert>();
+
+        foreach (var zoneId in zoneIds)
+        {
+            var alreadyAlerted = await alertRepository.ExistsActiveAlertAsync(request.UnitId, zoneId);
+            if (alreadyAlerted) continue;
+
+            var alert = Alert.Create(request.UnitId, zoneId, AlertSeverity.Low, 
+                $"{unit.Name} entered geofence zone");
+            await alertRepository.AddAsync(alert);
+            newAlerts.Add(alert);
+        }
+
+        await unitOfWork.SaveChangesAsync(cancellationToken);
+
+        return newAlerts;
     }
 }
