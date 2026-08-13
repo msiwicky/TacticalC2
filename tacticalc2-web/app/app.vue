@@ -4,9 +4,13 @@ import type { UnitHistoryEntry } from "~/composables/useApiClient";
 const { units, predictedPositions, alerts, isConnected, connect } =
 	useSignalR();
 const playbackEntry = ref<UnitHistoryEntry | null>(null);
+const { getZones, getAlerts } = useApiClient();
+const zones = ref<Zone[]>([]);
 
-onMounted(() => {
+onMounted(async () => {
 	connect();
+	zones.value = await getZones();
+	alerts.value = await getAlerts();
 });
 
 function handlePlaybackPosition(entry: UnitHistoryEntry | null) {
@@ -33,6 +37,7 @@ function handlePlaybackPosition(entry: UnitHistoryEntry | null) {
 				:units="units"
 				:predicted-positions="predictedPositions"
 				:playback-entry="playbackEntry"
+				:zones="zones"
 			/>
 		</div>
 	</div>

@@ -8,9 +8,59 @@ const props = defineProps<{
 	units: Map<string, Unit>;
 	predictedPositions: Map<string, PredictedPosition>;
 	playbackEntry?: UnitHistoryEntry | null;
+	zones: Zone[];
 }>();
 
 const predictionMarkers = new Map<string, maplibregl.Marker>();
+
+watch(
+	() => props.zones,
+	(zones) => {
+		if (!map) return;
+
+		const geojson = {
+			type: "FeatureCollection" as const,
+			features: zones.map((zone) => ({
+				type: "Feature" as const,
+				properties: { name: zone.name },
+				geometry: {
+					type: "Polygon" as const,
+					coordinates: [
+						zone.boundaryPoints.map((p) => [
+							p.longitude,
+							p.latitude,
+						]),
+					],
+				},
+			})),
+		};
+
+		const existingSource = map.getSource("zones") as
+			| maplibregl.GeoJSONSource
+			| undefined;
+
+		if (existingSource) {
+			existingSource.setData(geojson);
+		} else {
+			map.addSource("zones", { type: "geojson", data: geojson });
+
+			map.addLayer({
+				id: "zones-fill",
+				type: "fill",
+				source: "zones",
+				paint: { "fill-color": "#3b82f6", "fill-opacity": 0.15 },
+			});
+
+			map.addLayer({
+				id: "zones-outline",
+				type: "line",
+				source: "zones",
+				paint: { "line-color": "#3b82f6", "line-width": 2 },
+			});
+		}
+	},
+	{ deep: true },
+);
 
 watch(
 	() => props.predictedPositions,

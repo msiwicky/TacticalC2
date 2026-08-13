@@ -19,4 +19,12 @@ public class AlertRepository(TacticalDbContext dbContext) : IAlertRepository
         return dbContext.Alerts.AnyAsync(a => 
             a.UnitId == unitId && a.ZoneId == zoneId && a.TimestampUtc > cutoff);
     }
+    
+    public Task<List<Alert>> GetRecentAsync(int count)
+    {
+        return dbContext.Alerts
+            .OrderByDescending(a => a.TimestampUtc)
+            .Take(count)
+            .ToListAsync();
+    }
 }

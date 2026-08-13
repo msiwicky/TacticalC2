@@ -8,6 +8,12 @@ export interface UnitHistoryEntry {
 	timestampUtc: string;
 }
 
+export interface Zone {
+	id: string;
+	name: string;
+	boundaryPoints: { latitude: number; longitude: number }[];
+}
+
 export function useApiClient() {
 	const baseUrl = "http://localhost:5136";
 
@@ -32,5 +38,19 @@ export function useApiClient() {
 		return response.json();
 	}
 
-	return { getUnitHistory };
+	async function getZones(): Promise<Zone[]> {
+		const response = await fetch(`${baseUrl}/api/zones`);
+		if (!response.ok)
+			throw new Error(`Failed to fetch zones: ${response.status}`);
+		return response.json();
+	}
+
+	async function getAlerts(): Promise<Alert[]> {
+		const response = await fetch(`${baseUrl}/api/alerts`);
+		if (!response.ok)
+			throw new Error(`Failed to fetch alerts: ${response.status}`);
+		return response.json();
+	}
+
+	return { getUnitHistory, getZones, getAlerts };
 }
